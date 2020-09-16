@@ -131,9 +131,9 @@ def get_catalog_event(in_catalog, log_file, output=False, verbose=False):
     # Event description.
     event['id'] = in_catalog.resource_id.id
     event['description'] = in_catalog.event_descriptions[0]
-    if event['description'].type != 'Flinn - Engdahl region':
+    if 'Engdahl' not in event['description'].type:
         for desc in in_catalog.event_descriptions:
-            if desc.type == 'Flinn - Engdahl region':
+            if 'Engdahl' in desc.type:
                 event['description'] = desc
                 if verbose:
                     print(f'[INFO] Event description set to {in_catalog.desc.type} description.',
@@ -520,4 +520,5 @@ def get_iris_id(fdsn_id, dc):
         print(f'[ERR] Was not able to find IRIS ID for event ID {fdsn_id} from {dc} data center!')
 
     return iris_id
+
 
