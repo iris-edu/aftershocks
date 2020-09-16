@@ -37,28 +37,31 @@ switching to a different FDSN data event service provider may require further tu
              . basemap-data-hires   1.2.2
 
  ETOPO REQUIREMENTS:
-    This bundle uses ETOPO1 (a 1 arc-minute global relief model of Earth's surface) to draw topography when needed.
-    For this, it uses the ETOPO1 built using GMT 4.3.1 (ETOPO1_Ice_g_gmt4.grd, available from the NOAA website
-    https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/netcdf/). The
-    ETOPO1 file (~1 GB) should be download from NOAA at above URL and saved under the "assets" directory.
-    If you have the file saved in another location, make sure to point the parameter file to that location
-    (see the "topo_file" parameter in the parameter file).
+
+       This bundle uses ETOPO1 (a 1 arc-minute global relief model of Earth's surface) to draw topography when needed.
+       For this, it uses the ETOPO1 built using GMT 4.3.1 (ETOPO1_Ice_g_gmt4.grd, available from the NOAA website
+       https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/netcdf/). The
+       ETOPO1 file (~1 GB) should be download from NOAA at above URL and saved under the "assets" directory.
+       If you have the file saved in another location, make sure to point the parameter file to that location
+       (see the "topo_file" parameter in the parameter file).
 
  BUNDLE INSTALLATION:
-   unpack the bundle
-        . "src" directory contains the main code.
-        . The parameter file is under the "param" directory.
-        . "lib" directory has the library Python files.
-        . "assets" empty reserved for the ETOPO1 file (~1 GB), should be downloaded from NOAA (see ETOPO REQUIREMENTS).
+
+       unpack the bundle
+            . "src" directory contains the main code.
+            . The parameter file is under the "param" directory.
+            . "lib" directory has the library Python files.
+            . "assets" empty reserved for the ETOPO1 file (~1 GB), should be downloaded from NOAA (see ETOPO REQUIREMENTS).
 
  CONFIGURE THE PACKAGE:
-    With Python configured, you should be able to run the package examples without further modifications. However:
-    - if necessary, update the Python path on the first line of the src/aftershock_fdsn_maps.py
-    - if desired, configure the package by updating param/aftershock_fdsn_maps_param.py file
-    - For the conda version of Basemap, it needs the "PROJ_LIB" variable to be set so it can find the epsg data.
-      You can either set the environment variable "PROJ_LIB" to ""{your anaconda path}/share/proj" or place the
-      "os.environ['PROJ_LIB'] = '{your anaconda path}/share/proj'" statement just before importing the Basemap in the
-      main code.
+
+        With Python configured, you should be able to run the package examples without further modifications. However:
+        - if necessary, update the Python path on the first line of the src/aftershock_fdsn_maps.py
+        - if desired, configure the package by updating param/aftershock_fdsn_maps_param.py file
+        - For the conda version of Basemap, it needs the "PROJ_LIB" variable to be set so it can find the epsg data.
+          You can either set the environment variable "PROJ_LIB" to ""{your anaconda path}/share/proj" or place the
+          "os.environ['PROJ_LIB'] = '{your anaconda path}/share/proj'" statement just before importing the Basemap in the
+          main code.
 
  PACKAGE TEST:
 
