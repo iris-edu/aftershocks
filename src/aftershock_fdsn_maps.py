@@ -1210,7 +1210,7 @@ def location_animation_frame(magnitude, map_tag='aftershocks', map_type='locatio
 
     # This Basemap takes a while to draw, so save it as a pickle file and reload it in the loop.
     # File for use by Python's object serialization module pickle. Added time tag to make it unique to this run.
-    pickle_file = os.path.join(scratch_dir, f'{mainshock_id}_{map_type}_{int(datetime.now().strftime("%s"))}.pickle')
+    pickle_file = os.path.join(scratch_dir, f'{mainshock_id}_{map_type}_{int(datetime.now().timestamp())}.pickle')
 
     fig0 = matplotlib.pyplot.figure(figsize=(figure_size[0], figure_size[1]), dpi=param.dpi)
 
@@ -1482,7 +1482,7 @@ def heatmap_animation_frame(magnitude, map_tag='aftershocks', map_type='heatmap_
     frame_start_time = dp_time_animation_start
     frame_time = dp_time_animation_start
     files_to_load = f'{mainshock_id}_{map_tag}_{map_type}'
-    pickle_file = os.path.join(scratch_dir, f'{mainshock_id}_{map_type}_{int(datetime.now().strftime("%s"))}.pickle')
+    pickle_file = os.path.join(scratch_dir, f'{mainshock_id}_{map_type}_{int(datetime.now().timestamp())}.pickle')
 
     mainshock_frame_count = -1
     frame_count = -1
@@ -2105,3 +2105,4 @@ for i, plot in enumerate(plots):
             continue
         heatmap_animation_frame(min_mag, map_tag=tag, map_type=map_index[7], norm_min=norm_min,
                                 norm_max=norm_max)
+
