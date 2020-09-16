@@ -285,11 +285,12 @@ log_to_screen = param.log_to_screen
 if not log_to_screen:
     if log_dir is None:
         log_file = open(sys.stdout, 'a')
-        print(f'[WARN] Output to the log file if OFF')
+        print(f'[WARN] Output to the log file is OFF')
     else:
         log_file_name = os.path.join(param.log_dir, script.replace('.py', ''))
         log_file_name = f"{log_file_name}_{datetime.now().strftime('%Y-%m-%d')}"
         log_file_name = '.'.join([log_file_name, 'log'])
+        print(f'[INFO] Output is going to the log file {log_file_name}')
         log_file = open(log_file_name, 'a')
         sys.stdout = log_file
 
@@ -2105,4 +2106,3 @@ for i, plot in enumerate(plots):
             continue
         heatmap_animation_frame(min_mag, map_tag=tag, map_type=map_index[7], norm_min=norm_min,
                                 norm_max=norm_max)
-
