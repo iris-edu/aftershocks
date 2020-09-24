@@ -150,7 +150,7 @@ def usage():
           f'\t-l --label [string]\tinclude this label in the file name{new_line}'
           f'\t-p --plot [1,...]\tplots to create. Use one or more (comma separated) indices from the list of possible '
           f'plots (see the "map_description" variable in the param file)." {new_line}')
-
+    print('\nNote: Options 2 and 3 require GCMT solution.\n')
     print(f'\t\tindex\t\tdescription')
     print(f'\t\t{5 * "="}\t\t{11 * "="}')
     _desc = param.map_description
@@ -167,8 +167,11 @@ def usage():
           f'{new_line}'
           f'{new_line}NOTE: either eid or refid should be provided', flush=True)
     print(f'{new_line}Example:'
+          f'{new_line}{new_line}From: https://earthquake.usgs.gov/fdsnws/event/1/query?format=text&starttime='
+          f'2020-07-22&endtime=2020-07-23&minmag=6.8&nodata=404'
+          f'{new_line}{new_line} we obtain the event ID and then run:{new_line}'
           f'   {script} -v -e us7000asvb'
-          f'{new_line} create aftershock plots for event us7000asvb', flush=True)
+          f'{new_line} to create aftershock plots for event us7000asvb', flush=True)
     print('\n\n', flush=True)
 
 
@@ -2087,22 +2090,34 @@ for i, plot in enumerate(plots):
         magnitude_vs_days(min_mag, map_tag=tag)
     elif int(plot) == 2:
         if mainshock['mt'] is None:
+            print(f'[WARN] No GCMT solution found, plot of {param.map_description[plot]} not generated', flush=True,
+                  file=log_file)
+            print(f'[WARN] No GCMT solution found, plot of {param.map_description[plot]} not generated', flush=True)
             continue
         strike_vs_day(events['distance_along_strike'], map_tag=tag)
     elif int(plot) == 3:
         if mainshock['mt'] is None:
+            print(f'[WARN] No GCMT solution found, plot of {param.map_description[plot]} not generated', flush=True,
+                  file=log_file)
+            print(f'[WARN] No GCMT solution found, plot of {param.map_description[plot]} not generated', flush=True)
             continue
         strike_vs_depth(events['distance_along_strike'], map_tag=tag)
     elif int(plot) == 4:
         location_map(min_mag, q_start=query_time_start, q_end=query_time_end, map_tag=tag)
     elif int(plot) == 5:
         if len(events['latitude']) <= 1:
+            print(f'[WARN] No GCMT solution found, plot of {param.map_description[plot]} not generated', flush=True,
+                  file=log_file)
+            print(f'[WARN] No GCMT solution found, plot of {param.map_description[plot]} not generated', flush=True)
             continue
         norm_min, norm_max = heatmap(min_mag, map_tag=tag)
     elif int(plot) == 6:
         location_animation_frame(min_mag, map_tag=tag, map_type=map_index[6])
     elif int(plot) == 7:
         if len(events['latitude']) <= 1:
+            print(f'[WARN] No GCMT solution found, plot of {param.map_description[plot]} not generated', flush=True,
+                  file=log_file)
+            print(f'[WARN] No GCMT solution found, plot of {param.map_description[plot]} not generated', flush=True)
             continue
         heatmap_animation_frame(min_mag, map_tag=tag, map_type=map_index[7], norm_min=norm_min,
                                 norm_max=norm_max)
