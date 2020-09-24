@@ -95,6 +95,7 @@ mag_scale = {'magnitude_vs_day': 6.7, 'strike_vs_day': 6.7, 'heatmap': 3.5,
 map_list = [1, 2, 3, 4, 5, 6, 7]
 
 # The order represents the gallery display order.
+# Note: Options 2 and 3 require GCMT solution.
 map_order_list = [4, 5, 0, 1, 2, 3, 6, 7]
 map_index = {0: 'seismicity', 1: 'magnitude_vs_day', 2: 'strike_vs_day', 3: 'strike_vs_depth', 4: 'location_map',
              5: 'heatmap',
