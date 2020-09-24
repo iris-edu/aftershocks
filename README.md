@@ -92,8 +92,8 @@ USAGE:
 		=====		===========
 	    	0		Background seismicity within 100 km depth
 		1		Seismicity  within 10 days of mainshock
-	    	2		Aftershock distance along strike (nodal plane) vs day
-		3		Aftershock distance along strike (nodal plane) vs depth
+	    	2		[requires GCMT solution] Aftershock distance along strike (nodal plane) vs day
+		3		[requires GCMT solution] Aftershock distance along strike (nodal plane) vs depth
 	    	4		Location of events within 10 days of mainshock
 		5		heatmap of the seismicity  within 10 days of mainshock
 	    	6		Animation of the seismicity  within 10 days of mainshock
@@ -216,6 +216,5 @@ Or cite the following DOI:
  COMMENTS/QUESTIONS:
 
     Please contact manoch@iris.washington.edu
-
 
 
