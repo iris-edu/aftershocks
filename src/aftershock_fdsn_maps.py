@@ -1792,7 +1792,7 @@ try:
         elif opt in ('-a', '--after'):
             days_after = int(arg.strip())
         elif opt in ('-l', '--label'):
-            map_tag = arg.strip()
+            tag = arg.strip()
         elif opt in ('-s', '--scale'):
             scale = float(arg.strip())
         elif opt in ('-p', '--plots'):
