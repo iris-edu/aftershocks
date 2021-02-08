@@ -3,14 +3,14 @@
  Data Products Team\
  Aftershocks Data Product
 
- 2020-09-16
+ 2021-02-08
 
 ------------------------------------------------------------------------------------------------------------------------
 
  DESCRIPTION:
 
 Following all global earthquakes with magnitudes greater than 7, IRIS DMC Aftershocks data product 
-(http://ds.iris.edu/ds/products/aftershocks/) automatically generates a sequence animations and figures and makes them 
+(http://ds.iris.edu/ds/products/aftershocks/) automatically generates a sequence of animations and figures and makes them 
  available to public via DMC's Searchable Product Depository, SPUD (http://ds.iris.edu/spud/aftershock). Starting on August 1, 
 2020, events from the FDSN (USGS) web service (https://earthquake.usgs.gov/fdsnws/event/1/) and the GCMT catalog 
 (https://www.ldeo.columbia.edu/~gcmt/GCMT_Website_Additions/www.globalcmt.org.ghost.html) are used for this purpose. 
@@ -24,7 +24,7 @@ the FDSN event service from USGS to get the base event information. Then it quer
 will attempt to associate each GCMT event with the corresponding FDSN event. If association is successful, the FDSN 
 event is replaced with the corresponding GCMT event. User may select to also plot the unassociated GCMTs (if any). 
 Changing the FDSN event service provider (https://www.fdsn.org/webservices/) should be as simple as changing the 
-parameters. However, some data centers may have slightly different configuration and therefore change the service 
+parameters. However, some data centers may have slightly different configuration and therefore changing the service 
 provider may require further parameter tuning.
 
  CONTENT:
@@ -34,8 +34,8 @@ This package contains the following files:
      src/
        aftershock_fdsn_maps.py
            This is the main Python code behind the production of plots and animations. Calling the code with -h  
-           displays a list of other options available to tune plot and animation production. It also provides test 
-           examples to run.
+           option displays a list of other options available to tune plot and animation production. It also 
+           provides test examples to run.
      
      param/
        aftershock_fdsn_maps_param.py
@@ -110,7 +110,8 @@ USAGE:
 
     Example:   
     
-        From: https://earthquake.usgs.gov/fdsnws/event/1/query?format=text&starttime=2020-07-22&endtime=2020-07-23&minmag=6.8&nodata=404
+        From: 
+            https://earthquake.usgs.gov/fdsnws/event/1/query?format=text&starttime=2020-07-22&endtime=2020-07-23&minmag=6.8&nodata=404
 
         we obtain the event ID and then run:
              aftershock_fdsn_maps.py -v -e us7000asvb
@@ -142,7 +143,7 @@ EXAMPLES:
           . -x to select date label for x-axis
 
        The code should log its actions and at the end provide the path to the created image under the image 
-       directory. If you want the code to log to a file, then set the "log_to_screen" parameter to False in 
+       directory. If you want the code to log into a file, then set the "log_to_screen" parameter to False in 
        the parameter file.
 
     - To create more than one plot, run:
@@ -216,9 +217,9 @@ Or cite the following DOI:
 
 
  HISTORY
-- 2020-09-16 V.2020.260 FDSN R.2.1 public release
+- 2021-02-08 V.2021.039 FDSN R.2.1 public release
 - 2020-08-22 V.2020.236 FDSN support
-- 2020-08-01 V.2020.214 R2 release.
+- 2020-08-01 V.2020.214 R2 in production.
 - 2014-12-17 R1, development and initial release.
 
  

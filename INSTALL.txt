@@ -4,18 +4,18 @@
  Data Products Team
  Aftershocks Data Product
 
- 2020-09-16
+ 2021-02-08
 
 ------------------------------------------------------------------------------------------------------------------------
 
  DESCRIPTION:
 
-This is an IRIS DMC Python code bundle to produce animations and figures of seismicity similar to those of the
-Aftershocks data product (http://ds.iris.edu/ds/products/aftershocks/). The main script in this bundle
+This is an IRIS DMC Python code package to produce animations and figures of seismicity similar to those of the
+Aftershocks data product (http://ds.iris.edu/ds/products/aftershocks/). The main script in this package
 (src/aftershock_fdsn_maps.py) can be configured via its parameter file (param/aftershock_fdsn_maps_param.py) or  command
 line arguments.
 
-Currently bundle is configured to use the FDSN event service from USGS to get the base event information. Then it
+Currently package is configured to use the FDSN event service from USGS to get the base event information. Then it
 queries the Global CMT (GCMT) catalog and will attempt to associate GCMT events with the FDSN event. If an association
 is established, the FDSN event is replaced with the GCMT event. User may also select to  plot the remaining unassociated
 GCMT events (if any). Changing the FDSN (https://www.fdsn.org/webservices/) event service provider should be as simple
@@ -24,32 +24,32 @@ switching to a different FDSN event service provider may require further tuning.
 
  PYTHON REQUIREMENTS:
 
-       - this bundle has been tested under Python 3.8.3, Anaconda3-2020.07 on macOS 10.14.6, Windows 10.1903,
-          and Linux CentOS7.
+       - this package has been tested under Python 3.8.3, Anaconda3-2020.07 on macOS 10.14.6, Windows 10.1903,
+          and Linux CentOS7 (may work with older 3 versions).
 
        - additional required Python module(s) with the minimum version:
-             . basemap              1.2.2
-             . basemap-data-hires   1.2.2
-             . ffmpeg               4.3.1
-             . matplotlib           3.3.1
-             . netCDF4              1.5.4
-             . numpy                1.19.1
-             . obspy                1.2.2
-             . pillow               7.2.0
-             . scipy                1.5.2
+             . basemap              (tested with version 1.2.2)
+             . basemap-data-hires   (tested with version 1.2.2)
+             . ffmpeg               (tested with version 4.3.1)
+             . matplotlib           (tested with version 3.3.1)
+             . netCDF4              (tested with version 1.5.4)
+             . numpy                (tested with version 1.19.1)
+             . obspy                (tested with version 1.2.2)
+             . pillow               (tested with version 7.2.0)
+             . scipy                (tested with version 1.5.2)
 
  ETOPO REQUIREMENTS:
 
-       This bundle uses ETOPO1 (a 1 arc-minute global relief model of Earth's surface) to draw topography when needed.
+       This package uses ETOPO1 (a 1 arc-minute global relief model of Earth's surface) to draw topography when needed.
        For this, it uses the ETOPO1 built using GMT 4.3.1 (ETOPO1_Ice_g_gmt4.grd, available from the NOAA website
        https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/netcdf/). The
        ETOPO1 file (~1 GB) should be download from NOAA at above URL and saved under the "assets" directory.
        If you have the file saved in another location, make sure to point the parameter file to that location
        (see the "topo_file" parameter in the parameter file).
 
- BUNDLE INSTALLATION:
+ PACKAGE INSTALLATION:
 
-       unpack the bundle
+       unpack the package
             . "src" directory contains the main code.
             . The parameter file is under the "param" directory.
             . "lib" directory has the library Python files.
@@ -72,7 +72,6 @@ switching to a different FDSN event service provider may require further tuning.
 
     Run  "src/gmv_generalized.py -e us7000asvb -p 1 -x"  to create a Seismicity map within 10 days of the M 7.8
     Alaska event of July 22. The plot will appear under the image directory.
-
 
 
 
