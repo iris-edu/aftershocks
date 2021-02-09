@@ -1,22 +1,22 @@
 
-R.2.1 Public release
+r2.1 Public release
 
 src/aftershock_fdsn_maps.py
-    2020-09-16 Manoch: V.2020.260 FDSN R.2.1 public release
+    2021-02-09 Manoch: V.2021.040  r2.1 public release
     2020-08-22 Manoch: V.2020.236 FDSN support
-    2020-08-01 Manoch: V.2020.214 R2 release.
-    2014-12-17 Alex: R1, development and initial release.
+    2020-08-01 Manoch: V.2020.214 R2 release
+    2014-12-17 Alex: r1, development and initial release
 
 param/aftershock_fdsn_maps_param.py
-    2020-09-16 Manoch: V.2020.260 public release
+    2021-02-09 Manoch: V.2021.040  r2.1 public release
     2020-08-22 Manoch: V.2020.236 FDSN support
-    2020-08-01 Manoch: V.2020.214 release.
+    2020-08-01 Manoch: V.2020.214 release
 
 lib/event_fdsn_lib.py
-    2020-09-16 Manoch: V.2020.260 public release
+    2021-02-09 Manoch: V.2021.040  r2.1 public release
     2020-08-22 Manoch: V.2020.236 FDSN
 
 lib/aftershocks_fdsn_lib.py
-    2020-09-16 Manoch: V.2020.260 public release
+    2021-02-09 Manoch: V.2021.040  r2.1 public release
     2020-08-22 Manoch: V.2020.236 FDSN
-    2020-08-01 Manoch: V.2020.214 release.
+    2020-08-01 Manoch: V.2020.214 release
