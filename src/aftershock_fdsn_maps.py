@@ -75,15 +75,15 @@ import event_fdsn_lib as event_lib
     along with this program.  If not, see http://www.gnu.org/licenses/.
 
     History:
-        2020-09-16 Manoch: V.2020.260 R2.1 public release
+        2021-02-09 Manoch: V.2021.040  r2.1 public release
         2020-08-22 Manoch: V.2020.236 FDSN support
         2020-08-01 Manoch: V.2020.214 R2 release.
-        2014-12-17 Alex: R1, development and initial release.
+        2014-12-17 Alex: r1, development and initial release.
 
 """
 
 # Script info.
-script_version = 'V.2020.266'
+script_version = 'v.2021.040'
 script = sys.argv[0]
 script = os.path.basename(script)
 
