@@ -26,7 +26,7 @@ import math
     along with this program.  If not, see http://www.gnu.org/licenses/.
 
     History:
-        2020-09-16 Manoch: V.2020.260 public release
+        2021-02-09 Manoch: V.2021.040  r2.1 public release
         2020-08-22 Manoch: V.2020.236 FDSN support
         2020-08-01 Manoch: V.2020.214 release.
 
@@ -101,13 +101,13 @@ map_index = {0: 'seismicity', 1: 'magnitude_vs_day', 2: 'strike_vs_day', 3: 'str
              5: 'heatmap',
              6: 'location_animation', 7: 'heatmap_animation'}
 map_description = {0: 'Background seismicity within 100 km depth',
-                   1: 'Seismicity  within 10 days of mainshock',
-                   2: 'Aftershock distance along strike (nodal plane) vs day',
-                   3: 'Aftershock distance along strike (nodal plane) vs depth',
-                   4: 'Location of events within 10 days of mainshock',
-                   5: 'heatmap of the seismicity  within 10 days of mainshock',
-                   6: 'Animation of the seismicity  within 10 days of mainshock',
-                   7: 'Animation of the seismicity heatmap within 10 days of mainshock'}
+                   1: 'Seismicity plot within 10 days of the mainshock',
+                   2: 'Aftershock distance along the strike (nodal plane) vs day',
+                   3: 'Aftershock distance along the strike (nodal plane) vs depth',
+                   4: 'Location of events within 10 days of the mainshock',
+                   5: 'heatmap of the the seismicity  within 10 days of the mainshock',
+                   6: 'Animation of the seismicity  within 10 days of the mainshock',
+                   7: 'Animation of the seismicity heatmap within 10 days of the mainshock'}
 
 # Plot tag to be included as file name.
 map_tag = 'aftershocks_dp'
