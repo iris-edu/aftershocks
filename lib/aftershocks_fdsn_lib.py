@@ -51,9 +51,9 @@ import aftershock_fdsn_maps_param as param
     along with this program.  If not, see http://www.gnu.org/licenses/.
 
     History:
-        2020-09-16 Manoch: V.2020.260 public release
-        2020-08-22 Manoch: V.2020.236 FDSN support
-        2020-08-01 Manoch: V.2020.214 release.
+        2021-02-09 Manoch: v.2021.040  r2.1 public release
+        2020-08-22 Manoch: v.2020.236 FDSN support
+        2020-08-01 Manoch: v.2020.214 release.
 
 """
 
@@ -361,12 +361,12 @@ def set_map_parameters(mag):
         max_mag = 8.5
         aftershock_scale_factor = 1.9
     else:
-        map_size_lat = 1
+        map_size_lat = 1.5
         lat_line_spacing = 0.5
         scalebar_length_km = 50
         max_radius = 100
-        max_mag = 8.0
         min_mag = 1.3
+        max_mag = 8.0
         aftershock_scale_factor = 1.8
 
     max_radius = kilometer2degrees(max_radius)
