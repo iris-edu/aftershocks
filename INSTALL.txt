@@ -4,7 +4,7 @@
  Data Products Team
  Aftershocks Data Product
 
- 2021-02-08
+ 2021-02-09
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ switching to a different FDSN event service provider may require further tuning.
        - this package has been tested under Python 3.8.3, Anaconda3-2020.07 on macOS 10.14.6, Windows 10.1903,
           and Linux CentOS7 (may work with older 3 versions).
 
-       - additional required Python module(s) with the minimum version:
+       - additional required Python module(s) with the tested version:
              . basemap              (tested with version 1.2.2)
              . basemap-data-hires   (tested with version 1.2.2)
              . ffmpeg               (tested with version 4.3.1)
@@ -66,11 +66,13 @@ switching to a different FDSN event service provider may require further tuning.
           main code.
 
  PACKAGE TEST:
+    NOTE: Currently etopo is outputting "Clipping input data" message that we are working on and is not
+    affecting the output.
 
     Run src/python aftershock_fdsn_maps.py with "-h" option (assuming you have properly configured your Python
     installation) and it will print a USAGE messages.
 
-    Run  "src/gmv_generalized.py -e us7000asvb -p 1 -x"  to create a Seismicity map within 10 days of the M 7.8
+    Run  "src/aftershock_fdsn_maps.py -e us7000asvb -p 1 -x"  to create a seismicity plot within 10 days of the M 7.8
     Alaska event of July 22. The plot will appear under the image directory.
 
 
