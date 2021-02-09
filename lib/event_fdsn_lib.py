@@ -31,8 +31,8 @@ import uuid
     along with this program.  If not, see http://www.gnu.org/licenses/.
 
     History:
-        2020-09-16 Manoch: V.2020.260 public release
-        2020-08-22 Manoch: V.2020.236 FDSN
+        2021-02-09 Manoch: v.2021.040  r2.1 public release
+        2020-08-22 Manoch: v.2020.236 FDSN
 """
 
 # Association parameters
@@ -520,5 +520,4 @@ def get_iris_id(fdsn_id, dc):
         print(f'[ERR] Was not able to find IRIS ID for event ID {fdsn_id} from {dc} data center!')
 
     return iris_id
-
 
