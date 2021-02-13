@@ -75,15 +75,16 @@ import event_fdsn_lib as event_lib
     along with this program.  If not, see http://www.gnu.org/licenses/.
 
     History:
-        2021-02-09 Manoch: V.2021.040  r2.1 public release
-        2020-08-22 Manoch: V.2020.236 FDSN support
-        2020-08-01 Manoch: V.2020.214 R2 release.
+        2021-02-13 Manoch: v.2021.044 r2.2 updated heatmap scale label
+        2021-02-09 Manoch: v.2021.040 r2.1 public release
+        2020-08-22 Manoch: v.2020.236 FDSN support
+        2020-08-01 Manoch: v.2020.214 r2 release.
         2014-12-17 Alex: r1, development and initial release.
 
 """
 
 # Script info.
-script_version = 'v.2021.040'
+script_version = 'v.2021.044'
 script = sys.argv[0]
 script = os.path.basename(script)
 
@@ -1157,7 +1158,7 @@ def heatmap(magnitude, map_tag='aftershocks'):
     tick_locator = ticker.MaxNLocator(nbins=5)
     cb.locator = tick_locator
     cb.update_ticks()
-    cb.set_label('Number of earthquakes')
+    cb.set_label(f'earthquake density (count/{d_km}km x {d_km}km)')
 
     # Plot the logo.
     if os.path.isfile(param.logo_image):
@@ -1686,7 +1687,7 @@ def heatmap_animation_frame(magnitude, map_tag='aftershocks', map_type='heatmap_
             tick_locator = ticker.MaxNLocator(nbins=5)
             cb.locator = tick_locator
             cb.update_ticks()
-            cb.set_label('Number of earthquakes')
+            cb.set_label(f'earthquake density (count/{d_km}km x {d_km}km)')
 
         # Plot the logo.
         if os.path.isfile(param.logo_image):
