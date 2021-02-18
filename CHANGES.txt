@@ -1,5 +1,6 @@
 
 src/aftershock_fdsn_maps.py
+    2021-02-17 Manoch: v.2021.048 r2.3 updated the usage message.
     2021-02-13 Manoch: v.2021.044 r2.2 updated heatmap scale label
     2021-02-09 Manoch: v.2021.040 r2.1 public release
     2020-08-22 Manoch: v.2020.236 FDSN support

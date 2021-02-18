@@ -53,7 +53,7 @@ import event_fdsn_lib as event_lib
     This is the Python code behind the IRIS DMC's Aftershocks Data product. It is capable of producing plots and 
     animations that are part of the IRIS DMC's Aftershocks Data product (http://ds.iris.edu/spud/aftershock).
 
-    The code can be configured via its parameter file "aftershock_maps_param.par" or via the command line arguments. 
+    The code can be configured via its parameter file "aftershock_maps_param.py" or via the command line arguments. 
     Currently parameters are optimized for use with Mercator map projection, IRIS event services and IRIS GCMT data 
     product. Change in projection, resolution or data provider will require parameter tuning or code editing.
 
@@ -75,6 +75,7 @@ import event_fdsn_lib as event_lib
     along with this program.  If not, see http://www.gnu.org/licenses/.
 
     History:
+        2021-02-17 Manoch: v.2021.048 r2.3 updated the usage message.
         2021-02-13 Manoch: v.2021.044 r2.2 updated heatmap scale label
         2021-02-09 Manoch: v.2021.040 r2.1 public release
         2020-08-22 Manoch: v.2020.236 FDSN support
@@ -84,7 +85,7 @@ import event_fdsn_lib as event_lib
 """
 
 # Script info.
-script_version = 'v.2021.044'
+script_version = 'v.2021.048'
 script = sys.argv[0]
 script = os.path.basename(script)
 
@@ -129,15 +130,12 @@ def usage():
     """
     new_line = '\n'
     print(f'{new_line}{new_line}{script} ({script_version}):')
-    print(f'{new_line}This is the Python code behind the IRIS DMC\'s Aftershocks Data product. It is capable of '
-          f'{new_line}producing plots and animations that are part of the IRIS DMC\'s Aftershocks Data product '
-          f'{new_line}(http://ds.iris.edu/spud/aftershock).', flush=True)
 
-    print(f'{new_line}{new_line}This is the Python code behind the IRIS DMC\'s Aftershocks Data product. '
+    print(f'{new_line}{new_line}This is the Python 3 code behind the IRIS DMC\'s Aftershocks Data product. '
           f'It is capable of producing plots and {new_line}animations that are part of the IRIS DMC\'s Aftershocks '
           f'Data product (http://ds.iris.edu/spud/aftershock).{new_line}{new_line}'
 
-          f'The code can be configured via its parameter file "aftershock_maps_param.par" or via the command {new_line}'
+          f'The code can be configured via its parameter file "aftershock_maps_param.py" or via the command {new_line}'
           f'line arguments. Currently parameters are optimized for use with the Mercator map projection, NEIC/USGS FDSN'
           f'{new_line}event services and GCMT event catalog. Changes in projection, resolution or data provider may '
           f'require parameter tuning {new_line}and/or code update.'
@@ -160,17 +158,17 @@ def usage():
         print(f'\t\t{_i}\t\t{_desc[_i]}')
 
     print(f'\n\t-r --refid [event ID]\tprocess this FDSN event ID as a reference event{new_line}'
-          f'\t-s --scale [float] ETOPO uses scale to reduce map resolution for maps that are zoomed '
-          f'in. {new_line}The default scale is automatically set between 1.2 '
+          f'\t-s --scale [float] \tETOPO uses scale to reduce map resolution for maps that are zoomed '
+          f'in. {new_line}\t\t\t\tThe default scale is automatically set between 1.2 '
           f'and 2.6. The larger scale values require more memory{new_line}'
-          f'\t-x --xdate\tif -x is present, x-axis will have date labels rather than day labels{new_line}'
+          f'\t-x --xdate\t\tif -x is present, x-axis will have date labels rather than day labels{new_line}'
           f'\t-T --title [double-quoted]\tuse this title for  plots instead of the default title'
           f'{new_line}'
           f'{new_line}NOTE: either eid or refid should be provided', flush=True)
     print(f'{new_line}Example:'
           f'{new_line}{new_line}From: https://earthquake.usgs.gov/fdsnws/event/1/query?format=text&starttime='
           f'2020-07-22&endtime=2020-07-23&minmag=6.8&nodata=404'
-          f'{new_line}{new_line} we obtain the event ID and then run:{new_line}'
+          f'{new_line}{new_line} to obtain the event ID and then run:{new_line}'
           f'   {script} -v -e us7000asvb'
           f'{new_line} to create aftershock plots for event us7000asvb', flush=True)
     print('\n\n', flush=True)
