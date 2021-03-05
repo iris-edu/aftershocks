@@ -31,6 +31,8 @@ import uuid
     along with this program.  If not, see http://www.gnu.org/licenses/.
 
     History:
+        2021-03-04 Manoch: v.2021.063 check for lat/lon limits when making GCMT requests.
+                                      check for missing description in QuakeML.
         2021-02-09 Manoch: v.2021.040  r2.1 public release
         2020-08-22 Manoch: v.2020.236 FDSN
 """
@@ -75,8 +77,12 @@ def retrieve_gcmt_events(gcmt_url, log_file, eid=None):
 
     _data = this_response.read()
     this_response.close()
+    try:
+        lines = _data.decode('ascii').split('\n')
+    except Exception as ex:
+        print(f'[ERR] _data.decode\nfailed to convert {_data}.\n{ex}', flush=True, file=log_file)
+        return None
 
-    lines = _data.decode('ascii').split('\n')
     events = ''
 
     # Looking for the id line.
@@ -130,15 +136,25 @@ def get_catalog_event(in_catalog, log_file, output=False, verbose=False):
     event = dict()
     # Event description.
     event['id'] = in_catalog.resource_id.id
-    event['description'] = in_catalog.event_descriptions[0]
-    if 'Engdahl' not in event['description'].type:
-        for desc in in_catalog.event_descriptions:
-            if 'Engdahl' in desc.type:
-                event['description'] = desc
-                if verbose:
-                    print(f'[INFO] Event description set to {in_catalog.desc.type} description.',
-                          flush=True, file=log_file)
-                break
+
+    # Watch for empty descriptions.
+    if len(in_catalog.event_descriptions) > 0:
+        event['description'] = in_catalog.event_descriptions[0]
+
+        if 'Engdahl' not in event['description'].type:
+            for desc in in_catalog.event_descriptions:
+                if 'Engdahl' in desc.type:
+                    event['description'] = desc
+                    if verbose:
+                        print(f'[INFO] Event description set to {in_catalog.desc.type} description.',
+                              flush=True, file=log_file)
+                    # break
+    else:
+
+        event['description'] = '-'
+        if verbose:
+            print(f'[WARN] Missing event description.',
+                  flush=True, file=log_file)
 
     # Event origin.
     event['origin'] = in_catalog.origins[0]
@@ -305,7 +321,13 @@ def get_fdsn_events(fdsn_dc, start_str, end_str, lat_limits, lon_limits, min_mag
 
     for cat in catalog:
         this_event = get_catalog_event(cat, log_file)
-        fdsn_description.append(this_event['description'])
+
+        # Prevent crashes when event description is missing.
+        if 'description' in this_event:
+            fdsn_description.append(this_event['description'])
+        else:
+            fdsn_description.append(this_event['-'])
+
         fdsn_origin.append(this_event['origin'])
         fdsn_magnitude.append(this_event['magnitude'])
         fdsn_focal_mechanism.append(this_event['focal_mechanism'])
@@ -341,11 +363,20 @@ def get_event_by_id(event_id, fdsn_dc, scratch_dir, log_file, min_mag=3.1, gcmt_
     e_y, e_m, e_d = search_end.strftime('%Y-%m-%d').split('-')
 
     # GCMT form is not very sensitive to lat/lon, need to increase the threshold for search.
+    # Watch for validity.
     lat_min = fdsn_origin.latitude - association_threshold['latitude'] * 2.0
+    if lat_min < -90.0:
+        lat_min = -90.0
     lat_max = fdsn_origin.latitude + association_threshold['latitude'] * 2.0
+    if lat_max > 90.0:
+        lat_max = 90.0
 
     lon_min = fdsn_origin.longitude - association_threshold['longitude'] * 2.0
+    if lon_min < -180.0:
+        lon_min = -180.0
     lon_max = fdsn_origin.longitude + association_threshold['longitude'] * 2.0
+    if lon_max > 180.0:
+        lon_max = 180.0
 
     depth_min = (fdsn_origin.depth / 1000.0) - association_threshold['depth'] * 2.0
     if depth_min < 0:
@@ -427,10 +458,26 @@ def get_gcmt_events(start_str, end_str, lat_limits, lon_limits, min_mag, log_fil
     gcmt_mt = list()
     gcmt_id = list()
 
+    lat_min = lat_limits[0]
+    if lat_min < -90.0:
+        lat_min = -90.0
+
+    lat_max = lat_limits[1]
+    if lat_max > 90.0:
+        lat_max = 90.0
+
+    lon_min = lon_limits[0]
+    if lon_min < -180.0:
+        lon_min = -180.0
+
+    lon_max = lon_limits[1]
+    if lon_max > 180.0:
+        lon_max = 180.0
+
     gcmt_query = (f'itype=ymd&yr={s_y}&mo={int(s_m)}&day={int(s_d)}'
                   f'&oyr={e_y}&omo={int(e_m)}&oday={int(e_d)}&jyr=1976&jday=1&ojyr=1976'
-                  f'&ojday=1&otype=ymd&nday=1&lmw={min_mag}&umw=10&lms=0&ums=10&lmb=0&umb=10&llat={lat_limits[0]}'
-                  f'&ulat={lat_limits[1]}&llon={lon_limits[0]}&ulon={lon_limits[1]}'
+                  f'&ojday=1&otype=ymd&nday=1&lmw={min_mag}&umw=10&lms=0&ums=10&lmb=0&umb=10&llat={lat_min}'
+                  f'&ulat={lat_max}&llon={lon_min}&ulon={lon_max}'
                   f'&lhd={min_depth}&uhd={max_depth}&lts=-9999&uts=9999&lpe1=0'
                   f'&upe1=90&lpe2=0&upe2=90&list=4')
     
@@ -520,4 +567,3 @@ def get_iris_id(fdsn_id, dc):
         print(f'[ERR] Was not able to find IRIS ID for event ID {fdsn_id} from {dc} data center!')
 
     return iris_id
-
