@@ -35,7 +35,7 @@ import aftershock_fdsn_maps_param as param
 
     Copyright and License:
 
-    This software Copyright (c) 2018 IRIS (Incorporated Research Institutions for Seismology).
+    This software Copyright (c) 2021 IRIS (Incorporated Research Institutions for Seismology).
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,7 +51,8 @@ import aftershock_fdsn_maps_param as param
     along with this program.  If not, see http://www.gnu.org/licenses/.
 
     History:
-        2021-02-09 Manoch: v.2021.040  r2.1 public release
+        2021-03-12 Manoch: v.2021.071 r2.4 improved the GCMT association.
+        2021-02-09 Manoch: v.2021.040 r2.1 public release
         2020-08-22 Manoch: v.2020.236 FDSN support
         2020-08-01 Manoch: v.2020.214 release.
 
