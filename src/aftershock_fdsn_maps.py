@@ -59,7 +59,7 @@ import event_fdsn_lib as event_lib
 
     Copyright and License:
 
-    This software Copyright (c) 2018 IRIS (Incorporated Research Institutions for Seismology).
+    This software Copyright (c) 2021 IRIS (Incorporated Research Institutions for Seismology).
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,6 +75,10 @@ import event_fdsn_lib as event_lib
     along with this program.  If not, see http://www.gnu.org/licenses/.
 
     History:
+        2021-03-12 Manoch: v.2021.071 r2.4 improved the GCMT association and 
+                           changed the basemap limits from -180/180 to 0/360 to 
+                           keep map view correct when the search radius 
+                           extends beyond the 180/-180 longitude line.
         2021-02-17 Manoch: v.2021.048 r2.3 updated the usage message.
         2021-02-13 Manoch: v.2021.044 r2.2 updated heatmap scale label
         2021-02-09 Manoch: v.2021.040 r2.1 public release
@@ -85,9 +89,16 @@ import event_fdsn_lib as event_lib
 """
 
 # Script info.
-script_version = 'v.2021.048'
+script_version = 'v.2021.071'
 script = sys.argv[0]
 script = os.path.basename(script)
+
+
+def reset_stdout():
+    """Reset stdout and stderr to normal, after previously redirected  to a file"""
+    sys.stdout = sys.__stdout__
+    sys.stderr = sys.__stderr__
+    return
 
 
 def event_density_range(base_map, lat_list, lon_list, bin_width_km):
@@ -583,7 +594,7 @@ def strike_vs_day(distance_along_strike, map_tag='aftershocks'):
                     b.set_zorder(5000)
                     ax1.add_collection(b)
                     not_gcmt = False
-                except:
+                except Exception as ex:
                     if not warn_issued:
                         print(f'[WARN] GCMP beach ball failed for event {lon_index}')
                         warn_issued = True
@@ -803,7 +814,13 @@ def location_map(magnitude, map_tag='aftershocks', map_type='location_map', q_st
     # Some map parameters.
     map_size_lon = map_size_lat / math.cos(mainshock['latitude'] * math.pi / 180)
     lat_bounds = mainshock['latitude'] - map_size_lat, mainshock['latitude'] + map_size_lat
-    lon_bounds = mainshock['longitude'] - map_size_lon, mainshock['longitude'] + map_size_lon
+    lon_bound_left = mainshock['longitude'] - map_size_lon
+    lon_bound_right = mainshock['longitude'] + map_size_lon
+    if lon_bound_left < -180.0:
+        lon_bound_left += 360.0
+    if lon_bound_right > 180.0:
+        lon_bound_right -= 360.0
+    lon_bounds = lon_bound_left, lon_bound_right
 
     # Generate and save  earthquake browser link for the event.
     if None not in (q_start, q_end):
@@ -851,9 +868,16 @@ def location_map(magnitude, map_tag='aftershocks', map_type='location_map', q_st
              verticalalignment='top', transform=ax1.transAxes)
 
     # The basemap.
-    m = Basemap(projection='merc', llcrnrlat=lat_bounds[0], urcrnrlat=lat_bounds[1], llcrnrlon=lon_bounds[0],
-                urcrnrlon=lon_bounds[1], lat_ts=mainshock['latitude'],
+    left = lon_bounds[0]
+    if lon_bounds[0] < 0:
+        left = lon_bounds[0] + 360.0
+    right = lon_bounds[1]
+    if lon_bounds[1] < 0:
+        right = lon_bounds[1] + 360.0
+    m = Basemap(projection='merc', llcrnrlat=lat_bounds[0], urcrnrlat=lat_bounds[1], llcrnrlon=left,
+                urcrnrlon=right, lat_ts=mainshock['latitude'],
                 resolution=basemap_resolution)  # lat_ts = 20, lat of true scale
+
     # m.shadedrelief(alpha=location_map_relief_alpha, zorder=10)
     try:
         m.drawcoastlines(color='gray')
@@ -898,9 +922,11 @@ def location_map(magnitude, map_tag='aftershocks', map_type='location_map', q_st
     # Plot the aftershocks.
     warn_issued = False
     for lon_index, elon in enumerate(events['longitude']):
-        xmap, ymap = m(events['longitude'][lon_index], events['latitude'][lon_index])
+        add = 0.0
+        if elon < 0:
+            add = 360.0
+        xmap, ymap = m(elon+ add, events['latitude'][lon_index])
         size = (events['magnitude'][lon_index] / aftershock_scale_factor) ** 2.5
-
         # GCMT event.
         not_gcmt = True
         try:
@@ -913,7 +939,7 @@ def location_map(magnitude, map_tag='aftershocks', map_type='location_map', q_st
                           facecolor=aftershock_color[lon_index], edgecolor='k', axes=ax1)
                 b.set_zorder(5000)
                 ax1.add_collection(b)
-        except:
+        except Exception as ex:
             if not warn_issued:
                 print(f'[WARN] GCMP beach ball failed for event {lon_index}')
                 warn_issued = True
@@ -926,28 +952,31 @@ def location_map(magnitude, map_tag='aftershocks', map_type='location_map', q_st
                    markersize=size)
 
     # -------------- plot MainShock GCMT (slightly transparent)
+    _mlon = mainshock['longitude']
+    if _mlon < 0 :
+        _mlon += 360
     if mainshock['mt'] is not None:
-        b = beach(mainshock['mt'], xy=m(mainshock['longitude'], mainshock['latitude']),
+        b = beach(mainshock['mt'], xy=m(_mlon, mainshock['latitude']),
                   width=map_size_lat * ((aftershock_scale_factor * 3.3 * mainshock['magnitude']) ** 2.5), linewidth=0.5,
                   alpha=0.3,
                   facecolor=mainshock_color, edgecolor='k')
         b.set_zorder(10000)
         ax1.add_collection(b)
     else:
-        xmap, ymap = m(mainshock['longitude'], mainshock['latitude'])
+        xmap, ymap = m(_mlon, mainshock['latitude'])
         size = (mainshock['magnitude'] / aftershock_scale_factor) ** 2.5
         m.plot(xmap, ymap, marker='*', markerfacecolor=mainshock_color, markeredgecolor='k', markersize=size,
                markeredgewidth=marker_edge_width, zorder=10000, alpha=0.6)
 
     # Draw the search area circle.
-    x0, y0 = m(mainshock['longitude'], mainshock['latitude'])
-    x1, y1 = m(mainshock['longitude'], mainshock['latitude'] + max_radius)
+    x0, y0 = m(_mlon, mainshock['latitude'])
+    x1, y1 = m(_mlon, mainshock['latitude'] + max_radius)
     radius_map = y1 - y0
     circle = plt.Circle((x0, y0), radius_map, color=elevation_bar_color, alpha=elevation_bar_alpha,
                         lw=2, fill=False)
     ax1.add_patch(circle)
 
-    xmap, ymap = m(mainshock['longitude'], mainshock['latitude'])
+    xmap, ymap = m(_mlon, mainshock['latitude'])
     size = (mainshock['magnitude'] / aftershock_scale_factor) ** 2.5
     if mainshock['mt'] is None:
         m.plot(xmap, ymap, marker='*', markerfacecolor='y', markeredgecolor='k', markersize=size, alpha=0.6)
@@ -1002,7 +1031,13 @@ def heatmap(magnitude, map_tag='aftershocks'):
     # Some map parameters.
     map_size_lon = map_size_lat / math.cos(mainshock['latitude'] * math.pi / 180)
     lat_bounds = mainshock['latitude'] - map_size_lat, mainshock['latitude'] + map_size_lat
-    lon_bounds = mainshock['longitude'] - map_size_lon, mainshock['longitude'] + map_size_lon
+    lon_bound_left = mainshock['longitude'] - map_size_lon
+    lon_bound_right = mainshock['longitude'] + map_size_lon
+    if lon_bound_left < -180.0:
+        lon_bound_left += 360.0
+    if lon_bound_right > 180.0:
+        lon_bound_right -= 360.0
+    lon_bounds = lon_bound_left, lon_bound_right
 
     # Set up the figure.
     fig = matplotlib.pyplot.figure(figsize=(figure_size[0], figure_size[1]), dpi=param.dpi)
@@ -1017,8 +1052,14 @@ def heatmap(magnitude, map_tag='aftershocks'):
              verticalalignment='top', transform=ax1.transAxes)
 
     # The basemap.
-    m = Basemap(projection='merc', llcrnrlat=lat_bounds[0], urcrnrlat=lat_bounds[1], llcrnrlon=lon_bounds[0],
-                urcrnrlon=lon_bounds[1], lat_ts=mainshock['latitude'],
+    left = lon_bounds[0]
+    if lon_bounds[0] < 0:
+        left = lon_bounds[0] + 360.0
+    right = lon_bounds[1]
+    if lon_bounds[1] < 0:
+        right = lon_bounds[1] + 360.0
+    m = Basemap(projection='merc', llcrnrlat=lat_bounds[0], urcrnrlat=lat_bounds[1], llcrnrlon=left,
+                urcrnrlon=right, lat_ts=mainshock['latitude'],
                 resolution=basemap_resolution)  # lat_ts = 20, lat of true scale
 
     # m.shadedrelief(alpha=location_map_relief_alpha, zorder=10)
@@ -1067,10 +1108,16 @@ def heatmap(magnitude, map_tag='aftershocks'):
     # Plot heatmap on Basemap.
 
     lon_list = list()
-    lon_list.append(mainshock['longitude'])
+    _mlon = mainshock['longitude']
+    if _mlon < 0:
+        _mlon += 360.0
+
+    lon_list.append(_mlon)
     lat_list = list()
     lat_list.append(mainshock['latitude'])
     for _index, _elon in enumerate(events['longitude']):
+        if _elon < 0:
+            _elon += 360.0
         lon_list.append(_elon)
         lat_list.append(events['latitude'][_index])
 
@@ -1116,7 +1163,7 @@ def heatmap(magnitude, map_tag='aftershocks'):
 
     if mainshock['mt'] is not None:
         if mainshock['mt'][0] != 0 and mainshock['mt'][1] != 0:
-            b = beach(mainshock['mt'], xy=m(mainshock['longitude'], mainshock['latitude']),
+            b = beach(mainshock['mt'], xy=m(_mlon, mainshock['latitude']),
                       width=map_size_lat * ((aftershock_scale_factor * mag_scale['heatmap']
                                              * mainshock['magnitude']) ** 2.5), linewidth=0.5,
                       alpha=0.4,
@@ -1124,14 +1171,14 @@ def heatmap(magnitude, map_tag='aftershocks'):
             b.set_zorder(10000)
             ax1.add_collection(b)
     else:
-        xmap, ymap = m(mainshock['longitude'], mainshock['latitude'])
+        xmap, ymap = m(_mlon, mainshock['latitude'])
         size = (mainshock['magnitude'] / aftershock_scale_factor) ** 2.5
         m.plot(xmap, ymap, marker='*', markerfacecolor=mainshock_color, markeredgecolor='k', markersize=size,
                markeredgewidth=marker_edge_width, zorder=10000, alpha=0.6)
 
     # Draw the search area circle.
-    x0, y0 = m(mainshock['longitude'], mainshock['latitude'])
-    x1, y1 = m(mainshock['longitude'], mainshock['latitude'] + max_radius)
+    x0, y0 = m(_mlon, mainshock['latitude'])
+    x1, y1 = m(_mlon, mainshock['latitude'] + max_radius)
     radius_map = y1 - y0
     circle = plt.Circle((x0, y0), radius_map, color=elevation_bar_color, alpha=elevation_bar_alpha,
                         lw=2, fill=False)
@@ -1191,7 +1238,13 @@ def location_animation_frame(magnitude, map_tag='aftershocks', map_type='locatio
     # Some map parameters.
     map_size_lon = map_size_lat / math.cos(mainshock['latitude'] * math.pi / 180)
     lat_bounds = mainshock['latitude'] - map_size_lat, mainshock['latitude'] + map_size_lat
-    lon_bounds = mainshock['longitude'] - map_size_lon, mainshock['longitude'] + map_size_lon
+    lon_bound_left = mainshock['longitude'] - map_size_lon
+    lon_bound_right = mainshock['longitude'] + map_size_lon
+    if lon_bound_left < -180.0:
+        lon_bound_left += 360.0
+    if lon_bound_right > 180.0:
+        lon_bound_right -= 360.0
+    lon_bounds = lon_bound_left, lon_bound_right
 
     frame_end_time = dp_time_end
     if frame_end_time > datetime.utcnow():
@@ -1220,8 +1273,14 @@ def location_animation_frame(magnitude, map_tag='aftershocks', map_type='locatio
     gs1 = gridspec.GridSpec(3, 3)
     gs1.update(left=0.05, right=0.9, bottom=0.05, top=0.9, wspace=0.01)
     ax1 = plt.subplot(gs1[:, :])
-    m2 = Basemap(projection='merc', llcrnrlat=lat_bounds[0], urcrnrlat=lat_bounds[1], llcrnrlon=lon_bounds[0],
-                 urcrnrlon=lon_bounds[1], lat_ts=mainshock['latitude'],
+    left = lon_bounds[0]
+    if lon_bounds[0] < 0:
+        left = lon_bounds[0] + 360.0
+    right = lon_bounds[1]
+    if lon_bounds[1] < 0:
+        right = lon_bounds[1] + 360.0
+    m2 = Basemap(projection='merc', llcrnrlat=lat_bounds[0], urcrnrlat=lat_bounds[1], llcrnrlon=left,
+                 urcrnrlon=right, lat_ts=mainshock['latitude'],
                  resolution=basemap_resolution)  # lat_ts = 20, lat of true scale
 
     pickle.dump(m2, open(pickle_file, 'wb'), -1)
@@ -1295,6 +1354,8 @@ def location_animation_frame(magnitude, map_tag='aftershocks', map_type='locatio
 
         # Plot the aftershocks.
         for lon_index, elon in enumerate(events['longitude']):
+            if elon <0:
+                elon += 360.0
             this_event_time = events['datetime'][lon_index]
             this_hour = (frame_time - this_event_time) / 3600.0
 
@@ -1310,7 +1371,10 @@ def location_animation_frame(magnitude, map_tag='aftershocks', map_type='locatio
             elif alpha > 1:
                 alpha = 1
 
-            xmap, ymap = m(events['longitude'][lon_index], events['latitude'][lon_index])
+            _lon = elon
+            if _lon < 0.0:
+                _lon += 360.0
+            xmap, ymap = m(_lon, events['latitude'][lon_index])
             size = (events['magnitude'][lon_index] / aftershock_scale_factor) ** 2.5
 
             # GCMT events.
@@ -1325,19 +1389,21 @@ def location_animation_frame(magnitude, map_tag='aftershocks', map_type='locatio
                     b.set_zorder(5000)
                     ax1.add_collection(b)
                     not_gcmt = False
-                except:
+                except Exception as ex:
                     if not warn_issued:
                         print(f'[WARN] GCMP beach ball failed for event {lon_index}')
                         warn_issued = True
                     not_gcmt = True
             if not_gcmt:
-                m2.plot(xmap, ymap, markerfacecolor=aftershock_color[lon_index], markeredgecolor='k',
+                m.plot(xmap, ymap, markerfacecolor=aftershock_color[lon_index], markeredgecolor='k',
                         markeredgewidth=marker_edge_width, alpha=alpha,
                         marker='o', zorder=500,
                         markersize=size)
 
         # -------------- plot yellow star MainShock GCMT (slightly transparent)
-
+        _mlon = mainshock['longitude']
+        if _mlon < 0.0:
+            _mlon += 360.0
         if frame_time >= mainshock['datetime'] != 0:
             mainshock_frame_count += 1
             if mainshock_frame_count <= fade_duration:
@@ -1346,7 +1412,7 @@ def location_animation_frame(magnitude, map_tag='aftershocks', map_type='locatio
                 alpha = 0.3
             if mainshock['mt'] is not None:
                 if mainshock['mt'][1] != 0:
-                    b = beach(mainshock['mt'], xy=m(mainshock['longitude'], mainshock['latitude']),
+                    b = beach(mainshock['mt'], xy=m(_mlon, mainshock['latitude']),
                               width=map_size_lat * ((aftershock_scale_factor * 3.3 * mainshock['magnitude']) ** 2.5),
                               linewidth=0.5,
                               alpha=alpha,
@@ -1354,26 +1420,26 @@ def location_animation_frame(magnitude, map_tag='aftershocks', map_type='locatio
                     b.set_zorder(10000)
                     ax1.add_collection(b)
             else:
-                xmap, ymap = m(mainshock['longitude'], mainshock['latitude'])
+                xmap, ymap = m(_mlon, mainshock['latitude'])
                 size = (mainshock['magnitude']/ aftershock_scale_factor) ** 2.5
-                m2.plot(xmap, ymap, markerfacecolor=mainshock_color, markeredgecolor='k',
+                m.plot(xmap, ymap, markerfacecolor=mainshock_color, markeredgecolor='k',
                         markeredgewidth=marker_edge_width, alpha=alpha,
                         marker='o', zorder=10000,
                         markersize=size)
 
         # Draw the search area circle.
-        x0, y0 = m(mainshock['longitude'], mainshock['latitude'])
-        x1, y1 = m(mainshock['longitude'], mainshock['latitude'] + max_radius)
+        x0, y0 = m(_mlon, mainshock['latitude'])
+        x1, y1 = m(_mlon, mainshock['latitude'] + max_radius)
         radius_map = y1 - y0
         circle = plt.Circle((x0, y0), radius_map, color=elevation_bar_color, alpha=elevation_bar_alpha,
                             lw=2, fill=False)
         circle.set_zorder(10000)
         ax1.add_patch(circle)
 
-        xmap, ymap = m(mainshock['longitude'], mainshock['latitude'])
-        size = (mainshock['magnitude'] / aftershock_scale_factor) ** 2.5
-        if mainshock['latitude'] is None:
-            m.plot(xmap, ymap, marker='*', markerfacecolor='y', markeredgecolor='k', markersize=size, alpha=0.6)
+        # xmap, ymap = m(_mlon, mainshock['latitude'])
+        # size = (_mlon / aftershock_scale_factor) ** 2.5
+        # if mainshock['latitude'] is None:
+        #    m.plot(xmap, ymap, marker='*', markerfacecolor='y', markeredgecolor='k', markersize=size, alpha=0.6)
 
         # ---- if using projection = 'merc'
         scale_bar_lon = lon_bounds[0] + 1.6 * map_size_lon
@@ -1476,7 +1542,13 @@ def heatmap_animation_frame(magnitude, map_tag='aftershocks', map_type='heatmap_
     # Some map parameters.
     map_size_lon = map_size_lat / math.cos(mainshock['latitude'] * math.pi / 180)
     lat_bounds = mainshock['latitude'] - map_size_lat, mainshock['latitude'] + map_size_lat
-    lon_bounds = mainshock['longitude'] - map_size_lon, mainshock['longitude'] + map_size_lon
+    lon_bound_left = mainshock['longitude'] - map_size_lon
+    lon_bound_right = mainshock['longitude'] + map_size_lon
+    if lon_bound_left < -180.0:
+        lon_bound_left += 360.0
+    if lon_bound_right > 180.0:
+        lon_bound_right -= 360.0
+    lon_bounds = lon_bound_left, lon_bound_right
 
     frame_end_time = dp_time_end
     if frame_end_time > datetime.utcnow():
@@ -1504,8 +1576,15 @@ def heatmap_animation_frame(magnitude, map_tag='aftershocks', map_type='heatmap_
     gs1 = gridspec.GridSpec(3, 3)
     gs1.update(left=0.05, right=0.9, bottom=0.05, top=0.9, wspace=0.01)
     ax1 = plt.subplot(gs1[:, :])
-    m2 = Basemap(projection='merc', llcrnrlat=lat_bounds[0], urcrnrlat=lat_bounds[1], llcrnrlon=lon_bounds[0],
-                 urcrnrlon=lon_bounds[1], lat_ts=mainshock['latitude'],
+
+    left = lon_bounds[0]
+    if lon_bounds[0] < 0:
+        left = lon_bounds[0] + 360.0
+    right = lon_bounds[1]
+    if lon_bounds[1] < 0:
+        right = lon_bounds[1] + 360.0
+    m2 = Basemap(projection='merc', llcrnrlat=lat_bounds[0], urcrnrlat=lat_bounds[1], llcrnrlon=left,
+                 urcrnrlon=right, lat_ts=mainshock['latitude'],
                  resolution=basemap_resolution)  # lat_ts = 20, lat of true scale
 
     pickle.dump(m2, open(pickle_file, 'wb'), -1)
@@ -1514,7 +1593,12 @@ def heatmap_animation_frame(magnitude, map_tag='aftershocks', map_type='heatmap_
     plt.close('all')
 
     if norm_min is None or norm_max is None:
-        density_val, norm_min, norm_max = event_density_range(m2, events['latitude'], events['longitude'], d_km)
+        norm_lon = list()
+        for _lon in events['longitude']:
+            if _lon < 0:
+                _lon += 360.0
+            norm_lon.append(_lon)
+        density_val, norm_min, norm_max = event_density_range(m2, events['latitude'], norm_lon, d_km)
 
     while frame_start_time <= frame_time <= frame_end_time:
         frame_count += 1
@@ -1588,11 +1672,14 @@ def heatmap_animation_frame(magnitude, map_tag='aftershocks', map_type='heatmap_
         density = None
         for lon_index, elon in enumerate(events['longitude']):
             if events['datetime'][lon_index] <= frame_time:
+                if elon < 0:
+                    elon += 360.0
                 lon_list.append(elon)
                 lat_list.append(events['latitude'][lon_index])
         if lon_list:
-            start_lon = math.floor(min(events['longitude']))
-            end_lon = math.ceil(max(events['longitude']))
+            start_lon = math.floor(min(lon_list))
+            end_lon = math.ceil(max(lon_list))
+
             start_lat = math.floor(min(events['latitude']))
             end_lat = math.ceil(max(events['latitude']))
 
@@ -1635,10 +1722,14 @@ def heatmap_animation_frame(magnitude, map_tag='aftershocks', map_type='heatmap_
         else:
             mainshock_alpha = 0.3
 
+        _mlon = mainshock['longitude']
+        if _mlon < 0:
+            _mlon += 360.0
         if mainshock['mt'] is None:
-            xmap, ymap = m(mainshock['longitude'], mainshock['latitude'])
+
+            xmap, ymap = m(_mlon, mainshock['latitude'])
             size = (mainshock['magnitude']/ aftershock_scale_factor) ** 2.5
-            m2.plot(xmap, ymap, markerfacecolor=mainshock_color, markeredgecolor='k',
+            m.plot(xmap, ymap, markerfacecolor=mainshock_color, markeredgecolor='k',
                     markeredgewidth=marker_edge_width, alpha=mainshock_alpha,
                     marker='*', zorder=10000,
                     markersize=size)
@@ -1646,7 +1737,7 @@ def heatmap_animation_frame(magnitude, map_tag='aftershocks', map_type='heatmap_
                 mainshock['mt'][0] != 0 and mainshock['mt'][1] != 0:
 
             mainshock_frame_count += 1
-            b = beach(mainshock['mt'], xy=m(mainshock['longitude'], mainshock['latitude']),
+            b = beach(mainshock['mt'], xy=m(_mlon, mainshock['latitude']),
                       width=map_size_lat * ((aftershock_scale_factor * mag_scale['heatmap_animation']
                                              * mainshock['magnitude']) ** 2.5), linewidth=0.5,
                       alpha=mainshock_alpha,
@@ -1655,17 +1746,17 @@ def heatmap_animation_frame(magnitude, map_tag='aftershocks', map_type='heatmap_
             ax1.add_collection(b)
 
         # Draw the search area circle.
-        x0, y0 = m(mainshock['longitude'], mainshock['latitude'])
-        x1, y1 = m(mainshock['longitude'], mainshock['latitude'] + max_radius)
+        x0, y0 = m(_mlon, mainshock['latitude'])
+        x1, y1 = m(_mlon, mainshock['latitude'] + max_radius)
         radius_map = y1 - y0
         circle = plt.Circle((x0, y0), radius_map, color=elevation_bar_color, alpha=elevation_bar_alpha,
                             lw=2, fill=False)
         ax1.add_patch(circle)
 
-        xmap, ymap = m(mainshock['longitude'], mainshock['latitude'])
-        size = (mainshock['magnitude'] / aftershock_scale_factor) ** 2.5
-        if events['mt'][lon_index] is None:
-            m.plot(xmap, ymap, marker='*', markerfacecolor='y', markeredgecolor='k', markersize=size, alpha=0.6)
+        # xmap, ymap = m(_mlon, mainshock['latitude'])
+        # size = (mainshock['magnitude'] / aftershock_scale_factor) ** 2.5
+        #if events['mt'][lon_index] is None:
+        #    m.plot(xmap, ymap, marker='*', markerfacecolor='y', markeredgecolor='k', markersize=size, alpha=0.6)
 
         # ---- if using projection = 'merc'
         scale_bar_lon = lon_bounds[0] + 1.6 * map_size_lon
@@ -1766,6 +1857,7 @@ try:
                                         'label=', 'plots=', 'scale=', 'title=', 'rmag='])
     for opt, arg in options:
         if opt in ('-h', '--help'):
+            reset_stdout()
             usage()
             sys.exit(2)
         elif opt in ('-v', '--verbose'):
@@ -1808,6 +1900,7 @@ try:
             reference_mag = float(arg.strip())
 
 except getopt.GetoptError as er:
+    reset_stdout()
     usage()
     print(f'\n\n{60 * "="}\n{er}\n{60 * "="}\n\n', sep='\n', flush=True)
     sys.exit(3)
@@ -1817,6 +1910,7 @@ except getopt.GetoptError as er:
 is_reference_event = False
 if mainshock_id is not None and reference_event_id is not None:
     er = f'[ERR] Cannot define both mainshock ID and reference event ID.'
+    reset_stdout()
     usage()
     print(f'\n\n{60 * "="}\n{er}\n{60 * "="}\n\n', sep='\n', flush=True)
     sys.exit(4)
@@ -1825,12 +1919,14 @@ elif reference_event_id is not None:
     is_reference_event = True
 elif mainshock_id is None and reference_event_id is None:
     er = f'[ERR] Must provide either mainshock ID or reference event ID.'
+    reset_stdout()
     usage()
     print(f'\n\n{60 * "="}\n{er}\n{60 * "="}\n\n', sep='\n', flush=True)
     sys.exit(5)
 elif plots != [0] and days_before is None:
     er = f'[ERR] a days before option "-b" is only valid with plot option "-p" of 0.\n' \
          f'     (-p 0 -b none)'
+    reset_stdout()
     usage()
     print(f'\n\n{60 * "="}\n{er}\n{60 * "="}\n\n', sep='\n', flush=True)
     sys.exit(6)
@@ -1984,6 +2080,29 @@ gcmt_events, gcmt_url = event_lib.get_gcmt_events(this_start, query_time_end, la
                                                   max_depth=query_depth_end, min_depth=query_depth_start,
                                                   scratch_dir=scratch_dir,
                                                   return_url=True)
+# If crossing the 180 degrees longitude, check both sides for events.
+gcmt_events_2 = None
+
+if lon_limits[0] < -180.0:
+    gcmt_events_2, gcmt_url_2 = event_lib.get_gcmt_events(this_start, query_time_end, lat_limits,
+                                                          (lon_limits[0] + 360.0, 180.0), min_mag,
+                                                          log_file,
+                                                          max_depth=query_depth_end, min_depth=query_depth_start,
+                                                          scratch_dir=scratch_dir,
+                                                          return_url=True)
+elif lon_limits[1] > 180.0:
+    gcmt_events_2, gcmt_url_2 = event_lib.get_gcmt_events(this_start, query_time_end, lat_limits,
+                                                          (-180.0, lon_limits[1] - 360.0), min_mag,
+                                                          log_file,
+                                                          max_depth=query_depth_end, min_depth=query_depth_start,
+                                                          scratch_dir=scratch_dir,
+                                                          return_url=True)
+if gcmt_events is None and gcmt_events_2 is not None:
+    gcmt_events = gcmt_events_2
+elif gcmt_events is not None and gcmt_events_2 is not None:
+    for key in gcmt_events:
+        gcmt_events[key] += gcmt_events_2[key]
+
 if gcmt_events is not None:
     # For now we are using the values given in the association variable to associate FDSN and GCMT events. If
     # there are too many missed event, increase the association_factor to reduce the sensitivity.
