@@ -75,18 +75,6 @@ Or cite the following DOI:
     doi:10.17611/dp/as.code.1
 
 
- HISTORY
--c2021-03-12 v.2021.071 r2.4 improved the GCMT association and 
-                             changed the basemap limits from -180/180 to 0/360 to 
-                             keep map view correct when the search radius 
-                             extends beyond the 180/-180 longitude line.
-- 2021-02-17 v.2021.048 r2.3 updated the usage message
-- 2021-02-13 v.2021.044 r2.2 updated heatmap scale label
-- 2021-02-09 V.2021.040 FDSN r2.1 public release
-- 2020-08-22 V.2020.236 FDSN support
-- 2020-08-01 V.2020.214 r2 in production.
-- 2014-12-17 r1, development and initial release.
-
  
  COMMENTS/QUESTIONS:
 
