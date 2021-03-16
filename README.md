@@ -75,16 +75,6 @@ Or cite the following DOI:
     doi:10.17611/dp/as.code.1
 
 
- HISTORY
-- 2021-03-04 v.2021.063 r2.4 check for lat/lon limits when making GCMT requests.
-                                   check for missing description in QuakeML.
-- 2021-02-17 v.2021.048 r2.3 updated the usage message
-- 2021-02-13 v.2021.044 r2.2 updated heatmap scale label
-- 2021-02-09 v.2021.040 FDSN r2.1 public release
-- 2020-08-22 v.2020.236 FDSN support
-- 2020-08-01 v.2020.214 R2 in production.
-- 2014-12-17 r1, development and initial release.
-
  
  COMMENTS/QUESTIONS:
 
